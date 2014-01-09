@@ -58,7 +58,10 @@ print "Schema has been generated.\n";
 my @tables = split "\n", `mdb-tables -1 $mdb_name`;
 for (@tables) {
     print "Exporting data from table $_...\n";
-    `mdb-export $mdb_name $_ >> out.csv`;
+    
+    # We need to use tail because for some reason the columns are output as an extra row
+    `mdb-export $mdb_name $_ | tail -n+2 >> out.csv`; 
+
     `sqlite3 -separator "," $outdb_name '.import out.csv $_'`;
     `rm out.csv`;
 }
